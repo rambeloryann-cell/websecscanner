@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSecScanner — Inscription</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--navy:#1a2235;--blue:#4f83cc;--muted:#8892a4;--border:#2e3d52;--surface:#1e2d42}
+    body{background:var(--navy);min-height:100vh;font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column}
+    .navbar{background:rgba(14,17,25,0.95);border-bottom:1px solid var(--border);padding:14px 32px}
+    .navbar-brand{font-size:15px;font-weight:500;color:#fff!important;display:flex;align-items:center;gap:8px}
+    .brand-icon{width:26px;height:26px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+    .main-wrapper{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 16px}
+    .register-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:36px 32px;width:100%;max-width:440px}
+    .card-title-row{margin-bottom:28px}
+    .card-title-row h2{font-size:20px;font-weight:500;color:#fff;margin-bottom:4px}
+    .card-title-row p{font-size:13px;color:var(--muted);margin:0}
+    .form-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
+    .form-control{background:rgba(0,0,0,0.25)!important;border:1px solid var(--border)!important;color:#fff!important;border-radius:7px;padding:11px 14px;font-size:13px}
+    .form-control:focus{border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(79,131,204,0.15)!important}
+    .form-control::placeholder{color:rgba(255,255,255,0.2)!important}
+    .input-group .form-control{border-right:none!important;border-radius:7px 0 0 7px!important}
+    .input-group-text{background:rgba(0,0,0,0.25)!important;border:1px solid var(--border)!important;border-left:none!important;color:var(--muted)!important;border-radius:0 7px 7px 0!important;cursor:pointer}
+    .input-group-text:hover{color:#fff!important}
+    .btn-primary-custom{background:var(--blue);border:none;color:#fff;font-size:14px;font-weight:500;padding:12px;border-radius:7px;width:100%;cursor:pointer;transition:opacity 0.2s}
+    .btn-primary-custom:hover{opacity:0.9}
+    .btn-primary-custom:disabled{opacity:0.6;cursor:not-allowed}
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+    .divider-line{flex:1;height:1px;background:var(--border)}
+    .divider span{font-size:11px;color:var(--muted)}
+    .link-muted{color:#6a9fd8;text-decoration:none;font-size:13px}
+    .link-muted:hover{color:#fff}
+    .alert-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:7px;padding:10px 14px;font-size:13px}
+    .strength-wrap{margin-top:6px}
+    .strength-bar-bg{height:3px;border-radius:2px;background:var(--border);overflow:hidden}
+    .strength-bar{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;width:0}
+    .strength-label{font-size:11px;margin-top:4px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+  <a class="navbar-brand" href="/login">
+    <div class="brand-icon"><i class="bi bi-shield-check"></i></div>
+    WebSecScanner
+  </a>
+</nav>
+<div class="main-wrapper">
+  <div class="register-card">
+    <div class="card-title-row">
+      <h2>Créer un compte</h2>
+      <p>Accède à l'historique et aux rapports</p>
+    </div>
+    <div class="alert-error mb-3" id="error-msg" style="display:none"></div>
+    <form id="register-form">
+      <div class="mb-3">
+        <label class="form-label">Nom d'utilisateur</label>
+        <input type="text" class="form-control" id="username" placeholder="ryan" required minlength="3">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" placeholder="ryan@exemple.com" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Mot de passe</label>
+        <div class="input-group">
+          <input type="password" class="form-control" id="password" placeholder="••••••••" required minlength="8" oninput="checkStrength(this.value)">
+          <span class="input-group-text" onclick="togglePwd()"><i class="bi bi-eye" id="eye-icon"></i></span>
+        </div>
+        <div class="strength-wrap">
+          <div class="strength-bar-bg"><div class="strength-bar" id="strength-bar"></div></div>
+          <div class="strength-label" id="strength-label"></div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary-custom" id="submit-btn">
+        <i class="bi bi-person-plus me-2"></i>Créer le compte
+      </button>
+    </form>
+    <div class="divider"><div class="divider-line"></div><span>déjà un compte ?</span><div class="divider-line"></div></div>
+    <div class="text-center">
+      <a href="/login" class="link-muted"><i class="bi bi-arrow-left me-1"></i>Se connecter</a>
+    </div>
+  </div>
+</div>
+<script>
+  function togglePwd() {
+    const i = document.getElementById('password');
+    const ic = document.getElementById('eye-icon');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    ic.className = i.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+  }
+  function checkStrength(val) {
+    let s = 0;
+    if (val.length >= 8) s++;
+    if (/[A-Z]/.test(val)) s++;
+    if (/[0-9]/.test(val)) s++;
+    if (/[^A-Za-z0-9]/.test(val)) s++;
+    const lvl = [
+      {w:'0%',c:'transparent',t:''},
+      {w:'25%',c:'#f87171',t:'Faible'},
+      {w:'50%',c:'#fbbf24',t:'Moyen'},
+      {w:'75%',c:'#60a5fa',t:'Bon'},
+      {w:'100%',c:'#4ade80',t:'Fort'}
+    ];
+    document.getElementById('strength-bar').style.width = lvl[s].w;
+    document.getElementById('strength-bar').style.background = lvl[s].c;
+    document.getElementById('strength-label').textContent = lvl[s].t;
+    document.getElementById('strength-label').style.color = lvl[s].c;
+  }
+  document.getElementById('register-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const err = document.getElementById('error-msg');
+    const btn = document.getElementById('submit-btn');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Création...';
+    try {
+      const resp = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        err.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>' + data.error;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-person-plus me-2"></i>Créer le compte';
+      }
+    } catch {
+      err.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Erreur réseau.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-person-plus me-2"></i>Créer le compte';
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSecScanner — Connexion</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root { --navy:#1a2235;--blue:#4f83cc;--muted:#8892a4;--border:#2e3d52;--surface:#1e2d42; }
+    body { background:var(--navy);min-height:100vh;font-family:'Inter',system-ui,sans-serif;display:flex;flex-direction:column; }
+    .navbar { background:rgba(14,17,25,0.95);border-bottom:1px solid var(--border);padding:14px 32px; }
+    .navbar-brand { font-size:15px;font-weight:500;color:#fff!important;display:flex;align-items:center;gap:8px; }
+    .brand-icon { width:26px;height:26px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff; }
+    .main-wrapper { flex:1;display:flex;align-items:center;justify-content:center;padding:48px 16px; }
+    .login-grid { display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;max-width:1000px;width:100%; }
+    .left-panel .tag { display:inline-flex;align-items:center;gap:6px;background:rgba(79,131,204,0.12);border:1px solid rgba(79,131,204,0.3);color:#7ab3e0;font-size:11px;font-weight:500;padding:5px 12px;border-radius:100px;margin-bottom:24px; }
+    .tag-dot { width:5px;height:5px;border-radius:50%;background:var(--blue);animation:blink 2s infinite; }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+    .left-panel h1 { font-size:42px;font-weight:300;color:#fff;line-height:1.15;letter-spacing:-1.5px;margin-bottom:16px; }
+    .left-panel h1 span { color:#6a9fd8;font-weight:500; }
+    .left-panel p { color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:36px; }
+    .feature-list { display:flex;flex-direction:column;gap:12px; }
+    .feature-item { display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.5); }
+    .feature-item .bi { color:var(--blue);font-size:15px; }
+    .login-card { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:36px 32px; }
+    .card-title-row { margin-bottom:28px; }
+    .card-title-row h2 { font-size:20px;font-weight:500;color:#fff;margin-bottom:4px; }
+    .card-title-row p { font-size:13px;color:var(--muted);margin:0; }
+    .form-label { font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px; }
+    .form-control { background:rgba(0,0,0,0.25)!important;border:1px solid var(--border)!important;color:#fff!important;border-radius:7px;padding:11px 14px;font-size:13px; }
+    .form-control:focus { border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(79,131,204,0.15)!important; }
+    .form-control::placeholder { color:rgba(255,255,255,0.2)!important; }
+    .input-group .form-control { border-right:none!important;border-radius:7px 0 0 7px!important; }
+    .input-group-text { background:rgba(0,0,0,0.25)!important;border:1px solid var(--border)!important;border-left:none!important;color:var(--muted)!important;border-radius:0 7px 7px 0!important;cursor:pointer; }
+    .input-group-text:hover { color:#fff!important; }
+    .form-check-input { background-color:rgba(0,0,0,0.3)!important;border-color:var(--border)!important; }
+    .form-check-input:checked { background-color:var(--blue)!important;border-color:var(--blue)!important; }
+    .form-check-label { font-size:13px;color:var(--muted); }
+    .btn-primary-custom { background:var(--blue);border:none;color:#fff;font-size:14px;font-weight:500;padding:12px;border-radius:7px;width:100%;cursor:pointer;transition:opacity 0.2s; }
+    .btn-primary-custom:hover { opacity:0.9; }
+    .btn-primary-custom:disabled { opacity:0.6;cursor:not-allowed; }
+    .divider { display:flex;align-items:center;gap:12px;margin:20px 0; }
+    .divider-line { flex:1;height:1px;background:var(--border); }
+    .divider span { font-size:11px;color:var(--muted); }
+    .link-muted { color:#6a9fd8;text-decoration:none;font-size:13px; }
+    .link-muted:hover { color:#fff; }
+    .alert-error { background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:7px;padding:10px 14px;font-size:13px; }
+    @media(max-width:768px){.login-grid{grid-template-columns:1fr}.left-panel{display:none}}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+  <a class="navbar-brand" href="#">
+    <div class="brand-icon"><i class="bi bi-shield-check"></i></div>
+    WebSecScanner
+  </a>
+</nav>
+<div class="main-wrapper">
+  <div class="login-grid">
+    <div class="left-panel">
+      <div class="tag"><div class="tag-dot"></div>Scanner actif</div>
+      <h1>Audite la sécurité<br>de <span>tout site web.</span></h1>
+      <p>42 vérifications automatiques. Score sur 100. Rapport lisible sans formation en cybersécurité. Prêt en moins de 30 secondes.</p>
+      <div class="feature-list">
+        <div class="feature-item"><i class="bi bi-shield-fill-check"></i>Headers HTTP, SSL/TLS, cookies, DNS</div>
+        <div class="feature-item"><i class="bi bi-eye-slash-fill"></i>Scan passif — aucune requête vers la cible</div>
+        <div class="feature-item"><i class="bi bi-lightning-charge-fill"></i>Scan actif — analyse complète en direct</div>
+        <div class="feature-item"><i class="bi bi-graph-up"></i>Historique et rapports sauvegardés</div>
+        <div class="feature-item"><i class="bi bi-virus2"></i>VirusTotal + Google Web Risk intégrés</div>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="card-title-row">
+        <h2>Connexion</h2>
+        <p>Accède à tes scans et rapports</p>
+      </div>
+      <div class="alert-error mb-3" id="error-msg" style="display:none"></div>
+      <form id="login-form">
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="admin@websec.local" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mot de passe</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+            <span class="input-group-text" onclick="togglePwd()"><i class="bi bi-eye" id="eye-icon"></i></span>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mb-4">
+          <a href="/register" class="link-muted">Pas de compte ? S'inscrire</a>
+        </div>
+        <button type="submit" class="btn-primary-custom" id="submit-btn">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+        </button>
+      </form>
+      <div class="divider"><div class="divider-line"></div><span>comptes de démo</span><div class="divider-line"></div></div>
+      <div style="font-size:12px;color:var(--muted);text-align:center">
+        admin@websec.local / Demo1234 &nbsp;|&nbsp; user@websec.local / Demo1234
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function togglePwd() {
+    const i = document.getElementById('password');
+    const ic = document.getElementById('eye-icon');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    ic.className = i.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const err = document.getElementById('error-msg');
+    const btn = document.getElementById('submit-btn');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connexion...';
+    try {
+      const resp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        err.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>' + data.error;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Se connecter';
+      }
+    } catch {
+      err.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Erreur réseau.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Se connecter';
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

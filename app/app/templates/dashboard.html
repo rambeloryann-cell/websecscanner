@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSecScanner — Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--navy:#1a2235;--dark:#0e1119;--blue:#4f83cc;--muted:#8892a4;--border:#2e3d52;--surface:#1e2d42}
+    *{box-sizing:border-box}
+    body{background:#141c2b;font-family:'Inter',system-ui,sans-serif;color:#c9d1e0;min-height:100vh;margin:0}
+    .sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);min-height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100}
+    .sidebar-brand{display:flex;align-items:center;gap:8px;padding:18px 20px;border-bottom:1px solid var(--border);font-size:14px;font-weight:500;color:#fff;text-decoration:none}
+    .brand-icon{width:26px;height:26px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0}
+    .sidebar-section{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);letter-spacing:1.2px;text-transform:uppercase;padding:20px 20px 6px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;border-left:2px solid transparent;transition:all 0.15s}
+    .nav-item:hover{color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.04)}
+    .nav-item.active{color:#fff;background:rgba(79,131,204,0.1);border-left-color:var(--blue)}
+    .nav-item .bi{font-size:15px}
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding:14px 20px}
+    .user-row{display:flex;align-items:center;gap:10px}
+    .user-avatar{width:30px;height:30px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+    .user-name{font-size:13px;color:rgba(255,255,255,0.75)}
+    .user-email{font-size:11px;color:var(--muted)}
+    .logout-btn{margin-left:auto;background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:0;transition:color 0.15s}
+    .logout-btn:hover{color:#f87171}
+    .main{margin-left:220px}
+    .topbar{background:var(--dark);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+    .topbar-title{font-size:15px;font-weight:500;color:#fff}
+    .topbar-sub{font-size:12px;color:var(--muted);margin-top:1px}
+    .scan-bar{background:var(--dark);border-bottom:1px solid var(--border);padding:16px 32px}
+    .scan-label{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:10px}
+    .scan-row{display:flex;max-width:720px;gap:0}
+    .scan-input{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-right:none;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:10px 16px;border-radius:6px 0 0 6px;outline:none;transition:border-color 0.2s}
+    .scan-input:focus{border-color:var(--blue)}
+    .scan-input::placeholder{color:rgba(255,255,255,0.2)}
+    .seg-wrap{display:flex;border:1px solid var(--border);border-right:none}
+    .seg-btn{padding:10px 14px;background:rgba(0,0,0,0.2);border:none;color:rgba(255,255,255,0.35);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;border-right:1px solid var(--border);transition:all 0.15s;white-space:nowrap;position:relative}
+    .seg-btn.on{background:rgba(255,255,255,0.05);color:#fff}
+    .seg-btn.on::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .seg-btn.on.passive::before{background:var(--blue)}
+    .seg-btn.on.actif::before{background:#f59e0b}
+    .seg-sub{font-size:10px;color:rgba(255,255,255,0.2);display:block;margin-top:1px}
+    .seg-btn.on .seg-sub{color:rgba(255,255,255,0.4)}
+    .scan-go{background:var(--blue);border:1px solid var(--blue);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:10px 20px;border-radius:0 6px 6px 0;cursor:pointer;white-space:nowrap;transition:opacity 0.15s}
+    .scan-go.actif-mode{background:#b45309;border-color:#b45309}
+    .scan-go:hover{opacity:0.9}
+    .scan-go:disabled{opacity:0.6;cursor:not-allowed}
+    .content{padding:24px 32px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px}
+    .stat-label{font-size:11px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px}
+    .stat-val{font-size:28px;font-weight:300;color:#fff;letter-spacing:-1px;line-height:1}
+    .stat-sub{font-size:11px;color:var(--muted);margin-top:6px}
+    .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .section-title{font-size:13px;font-weight:500;color:rgba(255,255,255,0.75)}
+    .table-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .table-card table{width:100%;border-collapse:collapse;margin:0}
+    .table-card th{font-size:10px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;font-weight:500;padding:10px 18px;text-align:left;background:rgba(0,0,0,0.1);border-bottom:1px solid var(--border)}
+    .table-card td{padding:12px 18px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+    .table-card tr:last-child td{border-bottom:none}
+    .table-card tr:hover td{background:rgba(255,255,255,0.02)}
+    .url-td{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#c9d1e0;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bx{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px}
+    .bx-pass{background:rgba(74,222,128,0.1);color:#4ade80}
+    .bx-actf{background:rgba(245,158,11,0.12);color:#fbbf24}
+    .score-chip{font-size:13px;font-weight:500;padding:3px 10px;border-radius:4px;display:inline-block}
+    .sc-good{background:rgba(74,222,128,0.1);color:#4ade80}
+    .sc-mid{background:rgba(251,191,36,0.1);color:#fbbf24}
+    .sc-bad{background:rgba(248,113,113,0.1);color:#f87171}
+    .sev-crit{background:rgba(239,68,68,0.12);color:#f87171}
+    .sev-high{background:rgba(245,158,11,0.12);color:#fbbf24}
+    .sev-ok{background:rgba(74,222,128,0.1);color:#4ade80}
+    .date-td{font-size:11px;color:var(--muted)}
+    .action-btn{background:none;border:1px solid var(--border);color:rgba(255,255,255,0.45);font-size:12px;padding:4px 10px;border-radius:4px;cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-block}
+    .action-btn:hover{border-color:var(--blue);color:#6a9fd8}
+    .del-btn{background:none;border:1px solid var(--border);color:rgba(248,113,113,0.5);font-size:12px;padding:4px 8px;border-radius:4px;cursor:pointer;transition:all 0.15s}
+    .del-btn:hover{border-color:#f87171;color:#f87171}
+    .mini-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+    .mini-title{font-size:10px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;font-weight:500}
+    .api-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid rgba(255,255,255,0.05);font-size:12px}
+    .api-row:first-of-type{border-top:none}
+    .api-name{color:rgba(255,255,255,0.5)}
+    .tag-ok{font-size:10px;background:rgba(74,222,128,0.1);color:#4ade80;padding:2px 8px;border-radius:3px;font-weight:500}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+    .warn-strip{background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:8px 12px;font-size:11px;color:#856404;display:none;margin-top:6px;max-width:720px;display:none;align-items:flex-start;gap:8px}
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <a href="/dashboard" class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-shield-check"></i></div>
+    WebSecScanner
+  </a>
+  <div class="sidebar-section">Principal</div>
+  <a class="nav-item active" href="/dashboard"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+  <a class="nav-item" href="/scan"><i class="bi bi-search"></i>Nouveau scan</a>
+  <div class="sidebar-section">Compte</div>
+  <a class="nav-item" href="/register"><i class="bi bi-person-plus"></i>Créer un compte</a>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar" id="ua">?</div>
+      <div><div class="user-name" id="un">...</div><div class="user-email" id="ue">...</div></div>
+      <button class="logout-btn" onclick="logout()" title="Déconnexion"><i class="bi bi-box-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-sub">Vue d'ensemble de tes scans</div>
+    </div>
+    <a href="/scan" class="action-btn"><i class="bi bi-plus-lg me-1"></i>Nouveau scan</a>
+  </div>
+
+  <div class="scan-bar">
+    <div class="scan-label">Lancer un scan rapide</div>
+    <div class="scan-row">
+      <input class="scan-input" id="quick-url" type="text" placeholder="https://scanme.nmap.org">
+      <div class="seg-wrap">
+        <button class="seg-btn on passive" id="sq-p" onclick="switchMode('passive')">
+          <i class="bi bi-eye me-1"></i>Passif<span class="seg-sub">Toute cible</span>
+        </button>
+        <button class="seg-btn actif" id="sq-a" onclick="switchMode('active')">
+          <i class="bi bi-lightning-charge me-1"></i>Actif<span class="seg-sub">Autorisé seulement</span>
+        </button>
+      </div>
+      <button class="scan-go" id="quick-btn" onclick="quickScan()">
+        <i class="bi bi-search me-1" id="q-icon"></i><span id="q-label">Scan passif</span>
+      </button>
+    </div>
+    <div class="warn-strip" id="warn-strip">
+      <i class="bi bi-exclamation-triangle" style="flex-shrink:0;margin-top:1px"></i>
+      <span>Mode actif : ton IP sera visible dans les logs de la cible. Cibles autorisées uniquement.</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><div class="stat-card"><div class="stat-label">Scans totaux</div><div class="stat-val" id="s-total">—</div><div class="stat-sub">depuis la création du compte</div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-label">Score moyen</div><div class="stat-val" id="s-avg" style="color:#fbbf24">—</div><div class="stat-sub">sur 100</div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-label">Problèmes critiques</div><div class="stat-val" id="s-crit" style="color:#f87171">—</div><div class="stat-sub">détectés au total</div></div></div>
+      <div class="col-md-3"><div class="stat-card"><div class="stat-label">Dernier scan</div><div class="stat-val" id="s-last" style="font-size:14px;margin-top:4px">—</div><div class="stat-sub" id="s-last-url"></div></div></div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-8">
+        <div class="section-hdr">
+          <div class="section-title">Scans récents</div>
+        </div>
+        <div class="table-card" id="scans-table">
+          <div class="empty-state"><i class="bi bi-search" style="font-size:24px;display:block;margin-bottom:8px"></i>Aucun scan. Lance ton premier scan.</div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="section-hdr"><div class="section-title">APIs actives</div></div>
+        <div class="mini-card mb-3">
+          <div class="mini-title">Sources externes</div>
+          <div class="api-row"><span class="api-name">VirusTotal v3</span><span class="tag-ok">Configuré</span></div>
+          <div class="api-row"><span class="api-name">Google Web Risk</span><span class="tag-ok">Configuré</span></div>
+          <div class="api-row"><span class="api-name">crt.sh</span><span class="tag-ok">Actif</span></div>
+          <div class="api-row"><span class="api-name">DNS public</span><span class="tag-ok">Actif</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMode = 'passive';
+
+function switchMode(m) {
+  currentMode = m;
+  const sp = document.getElementById('sq-p');
+  const sa = document.getElementById('sq-a');
+  const btn = document.getElementById('quick-btn');
+  const icon = document.getElementById('q-icon');
+  const label = document.getElementById('q-label');
+  const warn = document.getElementById('warn-strip');
+  if (m === 'passive') {
+    sp.className = 'seg-btn on passive'; sa.className = 'seg-btn actif';
+    btn.className = 'scan-go'; icon.className = 'bi bi-eye me-1'; label.textContent = 'Scan passif';
+    warn.style.display = 'none';
+  } else {
+    sa.className = 'seg-btn on actif'; sp.className = 'seg-btn passive';
+    btn.className = 'scan-go actif-mode'; icon.className = 'bi bi-lightning-charge me-1'; label.textContent = 'Scan actif';
+    warn.style.display = 'flex';
+  }
+}
+
+async function quickScan() {
+  const url = document.getElementById('quick-url').value.trim();
+  if (!url) { alert('Renseigne une URL.'); return; }
+  const btn = document.getElementById('quick-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Scan...';
+  try {
+    const resp = await fetch('/api/scan/start', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url, mode: currentMode})
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      window.location.href = '/report/' + data.scan_id;
+    } else {
+      alert(data.error || 'Erreur lors du scan.');
+      btn.disabled = false;
+      switchMode(currentMode);
+    }
+  } catch {
+    alert('Erreur réseau.');
+    btn.disabled = false;
+    switchMode(currentMode);
+  }
+}
+
+function scoreClass(s) {
+  if (s === null || s === undefined) return 'sc-mid';
+  return s >= 80 ? 'sc-good' : s >= 50 ? 'sc-mid' : 'sc-bad';
+}
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 60) return 'à l\'instant';
+  if (diff < 3600) return `il y a ${Math.floor(diff/60)}min`;
+  if (diff < 86400) return `il y a ${Math.floor(diff/3600)}h`;
+  return d.toLocaleDateString('fr-FR');
+}
+
+async function deleteScan(id) {
+  if (!confirm('Supprimer ce scan ?')) return;
+  const resp = await fetch(`/api/dashboard/scans/${id}`, {method: 'DELETE'});
+  if (resp.ok) loadData();
+}
+
+function renderTable(scans) {
+  if (!scans.length) {
+    return '<div class="empty-state"><i class="bi bi-search" style="font-size:24px;display:block;margin-bottom:8px"></i>Aucun scan. Lance ton premier scan ci-dessus.</div>';
+  }
+  let html = `<table><thead><tr>
+    <th>URL</th><th>Mode</th><th>Score</th><th>Critiques</th><th>Date</th><th></th>
+  </tr></thead><tbody>`;
+  for (const s of scans) {
+    const sc = s.score !== null ? s.score : '—';
+    const scCls = scoreClass(s.score);
+    html += `<tr>
+      <td class="url-td" title="${s.url}">${s.url}</td>
+      <td><span class="bx ${s.mode === 'passive' ? 'bx-pass' : 'bx-actf'}">${s.mode === 'passive' ? 'Passif' : 'Actif'}</span></td>
+      <td>${s.score !== null ? `<span class="score-chip ${scCls}">${sc}/100</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${s.critical_count > 0 ? `<span class="bx sev-crit">${s.critical_count}</span>` : '<span class="bx sev-ok">0</span>'}</td>
+      <td class="date-td">${timeAgo(s.created_at)}</td>
+      <td style="display:flex;gap:6px">
+        <a href="/report/${s.id}" class="action-btn">Rapport</a>
+        <button class="del-btn" onclick="deleteScan(${s.id})"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>`;
+  }
+  return html + '</tbody></table>';
+}
+
+async function loadData() {
+  try {
+    const [statsR, scansR] = await Promise.all([
+      fetch('/api/dashboard/stats'),
+      fetch('/api/dashboard/scans')
+    ]);
+    if (statsR.status === 401 || scansR.status === 401) {
+      window.location.href = '/login'; return;
+    }
+    const stats = await statsR.json();
+    const scans = await scansR.json();
+
+    document.getElementById('s-total').textContent = stats.total ?? 0;
+    document.getElementById('s-avg').textContent = stats.avg_score !== null ? stats.avg_score : '—';
+    document.getElementById('s-crit').textContent = stats.critical_total ?? 0;
+    if (stats.last_scan) {
+      document.getElementById('s-last').textContent = timeAgo(stats.last_scan.created_at);
+      document.getElementById('s-last-url').textContent = stats.last_scan.url;
+    }
+    document.getElementById('scans-table').innerHTML = renderTable(scans);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function loadUser() {
+  try {
+    const resp = await fetch('/api/auth/me');
+    if (!resp.ok) { window.location.href = '/login'; return; }
+    const u = await resp.json();
+    document.getElementById('un').textContent = u.username;
+    document.getElementById('ue').textContent = u.email;
+    document.getElementById('ua').textContent = u.username.slice(0,2).toUpperCase();
+  } catch { window.location.href = '/login'; }
+}
+
+async function logout() {
+  await fetch('/api/auth/logout', {method: 'POST'});
+  window.location.href = '/login';
+}
+
+loadUser();
+loadData();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
